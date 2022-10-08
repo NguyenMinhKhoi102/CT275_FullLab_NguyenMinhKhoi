@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      crossorigin="anonymous"
+    />
+    <title>Pokemon Index</title>
+  </head>
+  <body class="container text-center">
+    <div class="text-center">
+      <h1>Pokemon Index</h1>
+      <form action="#">
+        <input type="text" id="pokemon-name" />
+        <input
+          type="button"
+          id="data-input"
+          class="btn btn-primary"
+          value="Tìm"
+        />
+      </form>
+    </div>
+    <hr />
+    <div id="result-return"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      $(function () {
+        const pokemonNameInput = $("#pokemon-name");
+        const searchBtn = $("#data-input");
+        const resultReturn = $("#result-return");
+
+        function searchPokemon(name) {
+          const titlePokemonCard = $(
+            "<h1 class='text-success w-100 text-uppercase'></h1>"
+          );
+          const imgFrontPokemon = $("<img />");
+          const imgBackPokemon = $("<img />");
+          const typePokemonAll = $("<div></div>");
+          resultReturn.html("<h1>Đang tìm kiếm .....</h1>");
+          resultReturn.prop("class", "");
+
+          $.getJSON(
+            `https://pokeapi.co/api/v2/pokemon/${name}`,
+            function (data) {
+              console.log(data);
+              if (data) {
+                resultReturn.html("");
+                titlePokemonCard.text(data.name);
+                imgFrontPokemon.prop("src", data.sprites.front_shiny);
+                imgBackPokemon.prop("src", data.sprites.back_shiny);
+                const typePokemonArr = data.types;
+                typePokemonAll.html("<h2 class='text-warning'>Type</h2>");
+                $.each(typePokemonArr, (element) => {
+                  const typePokemon = $("<p></p>");
+                  typePokemon.text(typePokemonArr[element].type.name);
+                  typePokemonAll.append(typePokemon);
+                });
+                resultReturn.append(titlePokemonCard);
+                resultReturn.append(imgFrontPokemon);
+                resultReturn.append(imgBackPokemon);
+                resultReturn.append(typePokemonAll);
+                resultReturn.prop("class", "shadow w-50 m-auto");
+              } else resultReturn.text("Không tìm thấy");
+            }
+          ).fail(function (error) {
+            console.log(error);
+            resultReturn.text("Không tìm thấy!");
+          });
+        }
+        searchBtn.on("click", function () {
+          const pokemonName = pokemonNameInput.val();
+          resultReturn.html("");
+          searchPokemon(pokemonName);
+        });
+
+        pokemonNameInput.keydown(function (event) {
+          if (event.keyCode === 13) {
+            searchBtn.trigger("click");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
